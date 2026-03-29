@@ -530,7 +530,8 @@ readingBtn.addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.reading) {
-     const formatted = data.reading
+const formatted = data.reading
+  .replace(/^#{1,3}\s+/gm, '')
   .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
   .replace(/\n/g, '<br>');
 readingResult.innerHTML = `<div class="reading-result">${formatted}</div>`;
