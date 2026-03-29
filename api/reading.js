@@ -29,12 +29,12 @@ module.exports = async function handler(req, res) {
 キーワード: ${keywords}
 ${question ? `質問: ${question}` : ''}
 
-以下の形式で日本語でリーディングしてください：
-・カードのメッセージ（2〜3文）
-・今日のアドバイス（1〜2文）
-・ねこからひとこと（猫らしい短いメッセージ）
+以下の形式で日本語でリーディングしてください。記号は使わずプレーンテキストで書いてください：
+カードのメッセージ（2〜3文）
+今日のアドバイス（1〜2文）
+ねこからひとこと（猫らしい短いメッセージ）
 
-    
+絵文字を適度に使い、読みやすく温かい文章でお願いします。`,
           },
         ],
       }),
@@ -53,4 +53,4 @@ ${question ? `質問: ${question}` : ''}
     console.error('Server error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-}
+};
