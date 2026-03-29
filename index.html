@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ねこルノルマン</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #1a0a2e 100%);
+      min-height: 100vh;
+      font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+      color: #f5e6c8;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #f5e6c8;
+      text-shadow: 0 0 20px rgba(255, 215, 100, 0.6);
+      letter-spacing: 0.1em;
+    }
+
+    header p {
+      color: #c9a96e;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    /* スプレッド選択 */
+    .spread-section {
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .spread-title {
+      font-size: 1rem;
+      color: #c9a96e;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .spread-buttons {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .spread-btn {
+      background: rgba(255, 215, 100, 0.1);
+      border: 1px solid rgba(255, 215, 100, 0.4);
+      color: #f5e6c8;
+      padding: 0.6rem 1.4rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .spread-btn:hover,
+    .spread-btn.active {
+      background: rgba(255, 215, 100, 0.25);
+      border-color: #f5c842;
+      color: #f5c842;
+    }
+
+    /* カード裏面エリア */
+    .card-area {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.5rem 1rem;
+      min-height: 200px;
+    }
+
+    .card-back {
+      width: 110px;
+      height: 165px;
+      background: linear-gradient(135deg, #2d1b4e, #4a2d7a);
+      border: 2px solid rgba(255, 215, 100, 0.5);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-back::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(255, 215, 100, 0.2);
+      border-radius: 7px;
+    }
+
+    .card-back:hover {
+      transform: translateY(-8px);
+      border-color: #f5c842;
+      box-shadow: 0 8px 25px rgba(245, 200, 66, 0.3);
+    }
+
+    .card-back.flipped {
+      cursor: default;
+      transform: none;
+    }
+
+    /* 引くボタン */
+    .draw-section {
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .draw-btn {
+      background: linear-gradient(135deg, #f5c842, #e8a020);
+      color: #1a0a2e;
+      border: none;
+      padding: 0.9rem 2.5rem;
+      border-radius: 2rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(245, 200, 66, 0.3);
+      letter-spacing: 0.05em;
+    }
+
+    .draw-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(245, 200, 66, 0.5);
+    }
+
+    .draw-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 引いたカード表示 */
+    .result-area {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 3rem;
+    }
+
+    .drawn-cards {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .drawn-card {
+      text-align: center;
+      animation: cardFlip 0.6s ease;
+    }
+
+    @keyframes cardFlip {
+      from { transform: rotateY(90deg) scale(0.8); opacity: 0; }
+      to { transform: rotateY(0deg) scale(1); opacity: 1; }
+    }
+
+    .drawn-card img {
+      width: 130px;
+      height: 195px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 215, 100, 0.6);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      display: block;
+    }
+
+    .drawn-card .card-placeholder {
+      width: 130px;
+      height: 195px;
+      border-radius: 10px;
+      border: 2px solid rgba(255, 215, 100, 0.6);
+      background: linear-gradient(135deg, #2d1b4e, #4a2d7a);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+
+    .drawn-card .card-number {
+      font-size: 0.75rem;
+      color: #c9a96e;
+      margin-top: 0.4rem;
+    }
+
+    .drawn-card .card-name {
+      font-size: 1rem;
+      color: #f5e6c8;
+      margin-top: 0.2rem;
+      font-weight: bold;
+    }
+
+    .drawn-card .card-keywords {
+      font-size: 0.75rem;
+      color: #a08060;
+      margin-top: 0.3rem;
+      max-width: 130px;
+    }
+
+    /* 質問入力 */
+    .question-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .question-section label {
+      display: block;
+      color: #c9a96e;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .question-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255, 215, 100, 0.3);
+      border-radius: 8px;
+      color: #f5e6c8;
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.3s;
+    }
+
+    .question-input:focus {
+      border-color: rgba(255, 215, 100, 0.6);
+    }
+
+    .question-input::placeholder {
+      color: rgba(245, 230, 200, 0.3);
+    }
+
+    /* リーディングボタン */
+    .reading-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #6a3db8, #4a2d7a);
+      color: #f5e6c8;
+      border: 1px solid rgba(255, 215, 100, 0.4);
+      padding: 0.9rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.05em;
+    }
+
+    .reading-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7a4dc8, #5a3d8a);
+      border-color: rgba(255, 215, 100, 0.7);
+    }
+
+    .reading-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* リーディング結果 */
+    .reading-result {
+      margin-top: 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 215, 100, 0.25);
+      border-radius: 12px;
+      padding: 1.5rem;
+      line-height: 1.8;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .loading {
+      text-align: center;
+      color: #c9a96e;
+      padding: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .loading::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '・'; }
+      60% { content: '・・'; }
+      80%, 100% { content: '・・・'; }
+    }
+
+    /* もう一度ボタン */
+    .reset-btn {
+      display: block;
+      margin: 2rem auto 0;
+      background: transparent;
+      border: 1px solid rgba(255, 215, 100, 0.4);
+      color: #c9a96e;
+      padding: 0.7rem 2rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:hover {
+      border-color: #f5c842;
+      color: #f5c842;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🐱 ねこルノルマン</h1>
+  <p>茶とら猫があなたの未来を教えてくれにゃ</p>
+</header>
+
+<!-- スプレッド選択 -->
+<div class="spread-section">
+  <p class="spread-title">✨ スプレッドを選んでください</p>
+  <div class="spread-buttons">
+    <button class="spread-btn active" data-spread="1">1枚引き</button>
+    <button class="spread-btn" data-spread="3">3枚引き</button>
+  </div>
+</div>
+
+<!-- カード裏面 -->
+<div class="card-area" id="cardArea"></div>
+
+<!-- 引くボタン -->
+<div class="draw-section">
+  <button class="draw-btn" id="drawBtn">🐾 カードを引く</button>
+</div>
+
+<!-- 結果エリア -->
+<div class="result-area hidden" id="resultArea">
+  <div class="drawn-cards" id="drawnCards"></div>
+
+  <div class="question-section">
+    <label>🌙 質問があれば入力してください（任意）</label>
+    <textarea class="question-input" id="questionInput" rows="2" placeholder="例：仕事の方向性について、恋愛について…"></textarea>
+  </div>
+
+  <button class="reading-btn" id="readingBtn">🔮 リーディングしてもらう</button>
+  <div id="readingResult"></div>
+
+  <button class="reset-btn" id="resetBtn">🔄 もう一度引く</button>
+</div>
+
+<script>
+// ===== 36枚のカードデータ =====
+const CARDS = [
+  { id: 1,  name: '騎士',    emoji: '🐴', keywords: '知らせ・速さ・訪問者',     image: 'images/01_knight.png' },
+  { id: 2,  name: '四つ葉',  emoji: '🍀', keywords: '幸運・希望・小さな喜び',   image: 'images/02_clover.png' },
+  { id: 3,  name: '船',      emoji: '⛵', keywords: '旅・出発・遠距離',         image: 'images/03_ship.png' },
+  { id: 4,  name: '家',      emoji: '🏠', keywords: '安定・家庭・安らぎ',       image: 'images/04_house.png' },
+  { id: 5,  name: '樹木',    emoji: '🌳', keywords: '健康・成長・根',           image: 'images/05_tree.png' },
+  { id: 6,  name: '雲',      emoji: '☁️', keywords: '不安・曖昧・混乱',         image: 'images/06_clouds.png' },
+  { id: 7,  name: '蛇',      emoji: '🐍', keywords: '複雑・嫉妬・誘惑',         image: 'images/07_snake.png' },
+  { id: 8,  name: '棺',      emoji: '⚰️', keywords: '終わり・変容・手放す',     image: 'images/08_coffin.png' },
+  { id: 9,  name: '花束',    emoji: '💐', keywords: '喜び・感謝・贈り物',       image: 'images/09_bouquet.png' },
+  { id: 10, name: '鎌',      emoji: '⚔️', keywords: '決断・分離・急変',         image: 'images/10_scythe.png' },
+  { id: 11, name: '鞭',      emoji: '🪄', keywords: '争い・繰り返し・厳しさ',   image: 'images/11_whip.png' },
+  { id: 12, name: '鳥',      emoji: '🐦', keywords: '会話・噂・対話',           image: 'images/12_birds.png' },
+  { id: 13, name: '子供',    emoji: '👶', keywords: '純粋・始まり・無邪気',     image: 'images/13_child.png' },
+  { id: 14, name: '狐',      emoji: '🦊', keywords: '策略・欺き・ずる賢さ',     image: 'images/14_fox.png' },
+  { id: 15, name: '熊',      emoji: '🐻', keywords: '力・保護・影響力',         image: 'images/15_bear.png' },
+  { id: 16, name: '星',      emoji: '⭐', keywords: '希望・導き・夢',           image: 'images/16_stars.png' },
+  { id: 17, name: 'コウノトリ', emoji: '🦢', keywords: '変化・移行・新しい始まり', image: 'images/17_stork.png' },
+  { id: 18, name: '犬',      emoji: '🐕', keywords: '友情・忠誠・信頼',         image: 'images/18_dog.png' },
+  { id: 19, name: '塔',      emoji: '🏰', keywords: '孤独・権威・境界',         image: 'images/19_tower.png' },
+  { id: 20, name: '庭園',    emoji: '🌸', keywords: '社交・公的場所・賑わい',   image: 'images/20_garden.png' },
+  { id: 21, name: '山',      emoji: '⛰️', keywords: '障害・困難・試練',         image: 'images/21_mountain.png' },
+  { id: 22, name: '道',      emoji: '🛤️', keywords: '選択・決断・岐路',         image: 'images/22_crossroads.png' },
+  { id: 23, name: '鼠',      emoji: '🐭', keywords: '損失・衰退・盗まれる',     image: 'images/23_mice.png' },
+  { id: 24, name: '心臓',    emoji: '❤️', keywords: '愛・感情・情熱',           image: 'images/24_heart.png' },
+  { id: 25, name: '指輪',    emoji: '💍', keywords: '契約・関係・約束',         image: 'images/25_ring.png' },
+  { id: 26, name: '本',      emoji: '📚', keywords: '秘密・知識・学び',         image: 'images/26_book.png' },
+  { id: 27, name: '手紙',    emoji: '✉️', keywords: '連絡・文書・情報',         image: 'images/27_letter.png' },
+  { id: 28, name: '男性',    emoji: '🎩', keywords: '男性・パートナー・主体',   image: 'images/28_gentleman.png' },
+  { id: 29, name: '女性',    emoji: '👒', keywords: '女性・パートナー・主体',   image: 'images/29_lady.png' },
+  { id: 30, name: '百合',    emoji: '🌷', keywords: '純粋・美・精神性',         image: 'images/30_lily.png' },
+  { id: 31, name: '太陽',    emoji: '☀️', keywords: '成功・喜び・活力',         image: 'images/31_sun.png' },
+  { id: 32, name: '月',      emoji: '🌕', keywords: '感情・直感・夢',           image: 'images/32_moon.png' },
+  { id: 33, name: '鍵',      emoji: '🗝️', keywords: '解決・開く・答え',         image: 'images/33_key.png' },
+  { id: 34, name: '魚',      emoji: '🐟', keywords: '豊かさ・ビジネス・流れ',   image: 'images/34_fish.png' },
+  { id: 35, name: '錨',      emoji: '⚓', keywords: '安定・忍耐・長期',         image: 'images/35_anchor.png' },
+  { id: 36, name: '十字架',  emoji: '✝️', keywords: '運命・宿命・信念',         image: 'images/36_cross.png' },
+];
+
+// ===== 状態 =====
+let currentSpread = 1;
+let drawnCards = [];
+
+// ===== 要素取得 =====
+const cardArea = document.getElementById('cardArea');
+const drawBtn = document.getElementById('drawBtn');
+const resultArea = document.getElementById('resultArea');
+const drawnCardsEl = document.getElementById('drawnCards');
+const questionInput = document.getElementById('questionInput');
+const readingBtn = document.getElementById('readingBtn');
+const readingResult = document.getElementById('readingResult');
+const resetBtn = document.getElementById('resetBtn');
+
+// ===== スプレッド切り替え =====
+document.querySelectorAll('.spread-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.spread-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSpread = parseInt(btn.dataset.spread);
+    renderCardBacks();
+  });
+});
+
+// ===== カード裏面を描画 =====
+function renderCardBacks() {
+  cardArea.innerHTML = '';
+  for (let i = 0; i < currentSpread; i++) {
+    const card = document.createElement('div');
+    card.className = 'card-back';
+    card.innerHTML = '🐾';
+    cardArea.appendChild(card);
+  }
+}
+renderCardBacks();
+
+// ===== カードを引く =====
+drawBtn.addEventListener('click', () => {
+  const shuffled = [...CARDS].sort(() => Math.random() - 0.5);
+  drawnCards = shuffled.slice(0, currentSpread);
+
+  // 裏面をアニメーション
+  const backs = cardArea.querySelectorAll('.card-back');
+  backs.forEach((back, i) => {
+    setTimeout(() => {
+      back.classList.add('flipped');
+      back.innerHTML = '✨';
+    }, i * 200);
+  });
+
+  setTimeout(() => {
+    showResult();
+  }, currentSpread * 200 + 400);
+});
+
+// ===== 結果表示 =====
+function showResult() {
+  drawnCardsEl.innerHTML = '';
+  drawnCards.forEach(card => {
+    const el = document.createElement('div');
+    el.className = 'drawn-card';
+
+    // 画像を試みる（なければプレースホルダー）
+    el.innerHTML = `
+      <div class="card-placeholder" id="placeholder-${card.id}">
+        <span>${card.emoji}</span>
+      </div>
+      <p class="card-number">${card.id}番</p>
+      <p class="card-name">【${card.name}】</p>
+      <p class="card-keywords">${card.keywords}</p>
+    `;
+
+    drawnCardsEl.appendChild(el);
+
+    // 画像があれば差し替え
+    const img = new Image();
+    img.onload = () => {
+      const placeholder = document.getElementById(`placeholder-${card.id}`);
+      if (placeholder) {
+        const imgEl = document.createElement('img');
+        imgEl.src = card.image;
+        imgEl.alt = card.name;
+        placeholder.replaceWith(imgEl);
+      }
+    };
+    img.src = card.image;
+  });
+
+  resultArea.classList.remove('hidden');
+  readingResult.innerHTML = '';
+  resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== リーディング =====
+readingBtn.addEventListener('click', async () => {
+  readingBtn.disabled = true;
+  readingResult.innerHTML = '<div class="loading">ねこが占い中にゃ</div>';
+
+  const cardNames = drawnCards.map(c => `${c.id}番「${c.name}」`).join('、');
+  const keywords = drawnCards.map(c => c.keywords).join(' / ');
+  const question = questionInput.value.trim();
+
+  try {
+    const res = await fetch('/api/reading', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cardName: cardNames,
+        cardNumber: drawnCards.map(c => c.id).join(','),
+        keywords,
+        question,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.reading) {
+      readingResult.innerHTML = `<div class="reading-result">${data.reading}</div>`;
+    } else {
+      readingResult.innerHTML = '<div class="reading-result">リーディングを取得できませんでした。</div>';
+    }
+  } catch (err) {
+    readingResult.innerHTML = '<div class="reading-result">エラーが発生しました。もう一度お試しください。</div>';
+  } finally {
+    readingBtn.disabled = false;
+  }
+});
+
+// ===== リセット =====
+resetBtn.addEventListener('click', () => {
+  drawnCards = [];
+  resultArea.classList.add('hidden');
+  readingResult.innerHTML = '';
+  questionInput.value = '';
+  renderCardBacks();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+</body>
+</html>
