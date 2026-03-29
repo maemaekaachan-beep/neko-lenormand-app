@@ -530,7 +530,10 @@ readingBtn.addEventListener('click', async () => {
     const data = await res.json();
 
     if (data.reading) {
-      readingResult.innerHTML = `<div class="reading-result">${data.reading}</div>`;
+     const formatted = data.reading
+  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  .replace(/\n/g, '<br>');
+readingResult.innerHTML = `<div class="reading-result">${formatted}</div>`;
     } else {
       readingResult.innerHTML = '<div class="reading-result">リーディングを取得できませんでした。</div>';
     }
