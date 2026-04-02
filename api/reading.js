@@ -3,7 +3,7 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { cardName, cardNumber, keywords, question } = req.body;
+  const { cardName, cardNumber, keywords, question, spreadLabel } = req.body;
 
   if (!cardName) {
     return res.status(400).json({ error: 'cardName is required' });

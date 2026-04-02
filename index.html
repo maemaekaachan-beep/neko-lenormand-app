@@ -276,6 +276,9 @@
     }
 
     /* リーディング結果 */
+    .grand-tableau { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; max-width: 100%; }
+    .grand-tableau .drawn-card { font-size: 0.7rem; padding: 4px; }
+    .grand-tableau .drawn-card img { max-width: 100%; height: auto; }
     .reading-result {
       margin-top: 1.5rem;
       background: rgba(255, 255, 255, 0.04);
@@ -353,6 +356,7 @@
   <div class="spread-buttons">
     <button class="spread-btn active" data-spread="1">1枚引き</button>
     <button class="spread-btn" data-spread="3">3枚引き</button>
+        <button class="spread-btn" data-spread="36">🐱 グランタブロー（36枚）</button>
   </div>
 </div>
 
@@ -474,6 +478,7 @@ drawBtn.addEventListener('click', () => {
 // ===== 結果表示 =====
 function showResult() {
   drawnCardsEl.innerHTML = '';
+  if (drawnCards.length === 36) { drawnCardsEl.classList.add('grand-tableau'); } else { drawnCardsEl.classList.remove('grand-tableau'); }
   drawnCards.forEach(card => {
     const el = document.createElement('div');
     el.className = 'drawn-card';
@@ -507,6 +512,8 @@ function showResult() {
   resultArea.classList.remove('hidden');
   readingResult.innerHTML = '';
   resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const isGrandTableau = drawnCards.length === 36;
+    const spreadLabel = isGrandTableau ? 'グランタブロー（9×4の36枚展開）' : `${drawnCards.length}枚引き`;
 }
 
 // ===== リーディング =====
@@ -527,6 +534,7 @@ readingBtn.addEventListener('click', async () => {
         cardNumber: drawnCards.map(c => c.id).join(','),
         keywords,
         question,
+            spreadLabel,
       }),
     });
 
