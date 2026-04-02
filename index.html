@@ -279,6 +279,13 @@
     .grand-tableau { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; max-width: 100%; }
     .grand-tableau .drawn-card { font-size: 0.7rem; padding: 4px; }
     .grand-tableau .drawn-card img { max-width: 100%; height: auto; }
+    .cross-layout { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; }
+    .cross-layout .drawn-card:nth-child(1) { grid-column: 2; grid-row: 1; }
+    .cross-layout .drawn-card:nth-child(2) { grid-column: 1; grid-row: 2; }
+    .cross-layout .drawn-card:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .cross-layout .drawn-card:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .cross-layout .drawn-card:nth-child(5) { grid-column: 2; grid-row: 3; }
+    .three-by-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 500px; margin: 0 auto; }
     .reading-result {
       margin-top: 1.5rem;
       background: rgba(255, 255, 255, 0.04);
@@ -480,7 +487,10 @@ drawBtn.addEventListener('click', () => {
 // ===== 結果表示 =====
 function showResult() {
   drawnCardsEl.innerHTML = '';
-  if (drawnCards.length === 36) { drawnCardsEl.classList.add('grand-tableau'); } else { drawnCardsEl.classList.remove('grand-tableau'); }
+  drawnCardsEl.classList.remove('grand-tableau','cross-layout','three-by-three');
+  if (drawnCards.length === 36) { drawnCardsEl.classList.add('grand-tableau'); }
+  else if (drawnCards.length === 5) { drawnCardsEl.classList.add('cross-layout'); }
+  else if (drawnCards.length === 9) { drawnCardsEl.classList.add('three-by-three'); }
   drawnCards.forEach(card => {
     const el = document.createElement('div');
     el.className = 'drawn-card';
