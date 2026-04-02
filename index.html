@@ -512,8 +512,6 @@ function showResult() {
   resultArea.classList.remove('hidden');
   readingResult.innerHTML = '';
   resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    const isGrandTableau = drawnCards.length === 36;
-    const spreadLabel = isGrandTableau ? 'グランタブロー（9×4の36枚展開）' : `${drawnCards.length}枚引き`;
 }
 
 // ===== リーディング =====
@@ -521,6 +519,8 @@ readingBtn.addEventListener('click', async () => {
   readingBtn.disabled = true;
   readingResult.innerHTML = '<div class="loading">ねこが占い中にゃ</div>';
 
+    const isGrandTableau = drawnCards.length === 36;
+    const spreadLabel = isGrandTableau ? 'グランタブロー（9×4の36枚展開）' : `${drawnCards.length}枚引き`;
   const cardNames = drawnCards.map(c => `${c.id}番「${c.name}」`).join('、');
   const keywords = drawnCards.map(c => c.keywords).join(' / ');
   const question = questionInput.value.trim();
