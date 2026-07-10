@@ -559,10 +559,10 @@ const formatted = data.reading
   .replace(/\n/g, '<br>');
 readingResult.innerHTML = `<div class="reading-result">${formatted}</div>`;
     } else {
-      readingResult.innerHTML = '<div class="reading-result">リーディングを取得できませんでした。</div>';
+      readingResult.innerHTML = `<div class="reading-result">${data.error || 'リーディングを取得できませんでした。'}</div>`;
     }
   } catch (err) {
-    readingResult.innerHTML = '<div class="reading-result">エラーが発生しました。もう一度お試しください。</div>';
+    readingResult.innerHTML = `<div class="reading-result">エラーが発生しました: ${err.message}</div>`;
   } finally {
     readingBtn.disabled = false;
   }
